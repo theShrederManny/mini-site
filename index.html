@@ -3,137 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HACKED ME</title>
+    <title>ESP8266 Deauther - Visual Simulator</title>
     <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --panel-bg: #141414;
+            --accent-color: #00ff66;
+            --text-color: #ffffff;
+            --text-muted: #888888;
+            --danger-color: #ff3333;
+        }
+
         body {
-            font-family: 'Courier New', monospace;
-            background-color: #050505;
-            color: #00ff00;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
-        .card {
-            background: #111111;
-            padding: 30px;
-            border-radius: 10px;
-            border: 1px solid #00ff00;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
+
+        .dashboard {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 8px;
+            overflow: hidden;
         }
-        .avatar {
-            font-size: 50px;
-            margin-bottom: 15px;
+
+        .header {
+            background-color: #1a1a1a;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        h1 {
-            margin: 0 0 10px 0;
-            font-size: 26px;
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            text-transform: uppercase;
             letter-spacing: 2px;
         }
-        .static-text {
-            color: #888888;
-            font-size: 16px;
+
+        .status-badge {
+            background-color: rgba(0, 255, 102, 0.1);
+            color: var(--accent-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            border: 1px solid var(--accent-color);
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
             margin-bottom: 20px;
         }
-        .btn {
-            display: inline-block;
-            background-color: transparent;
-            color: #00ff00;
-            text-decoration: none;
-            padding: 12px 24px;
-            border: 1px solid #00ff00;
-            border-radius: 4px;
-            font-weight: bold;
+
+        button {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 10px 20px;
+            font-family: inherit;
+            cursor: pointer;
             transition: all 0.3s ease;
-        }
-        .btn:hover {
-            background-color: #00ff00;
-            color: #000000;
-            box-shadow: 0 0 15px #00ff00;
+            text-transform: uppercase;
+            font-weight: bold;
+            flex: 1;
         }
 
-        /* КУПЕЦ: Создаем анимацию мерцания экрана */
-        @keyframes matrix-blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        button:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
         }
 
-        /* Применяем мерцание к терминалу */
-        #terminal {
-            color: #00ff00; 
-            text-align: left; 
-            font-size: 14px; 
-            margin-bottom: 20px; 
-            white-space: pre-wrap; 
-            animation: matrix-blink 2s infinite; /* Плавно мерцает каждые 2 секунды */
+        button:disabled {
+            border-color: var(--text-muted);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .network-list {
+            border: 1px solid #333;
+            background-color: #0d0d0d;
+            border-radius: 4px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .network-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid #222;
+            align-items: center;
+        }
+
+        .network-item:last-child {
+            border-bottom: none;
+        }
+
+        .network-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ssid {
+            font-weight: bold;
+        }
+
+        .mac {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .signal {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+
+        .terminal-log {
+            margin-top: 20px;
+            background-color: #000;
+            border: 1px solid #222;
+            padding: 10px;
+            font-size: 0.8rem;
+            color: #00ff00;
+            height: 80px;
+            overflow-y: auto;
+            border-radius: 4px;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+
+        /* Анимация загрузки */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: var(--accent-color);
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="avatar">😈</div>
-        <h1 id="main-title">HACKED ME</h1>
-        
-        <p class="static-text">#$£&@#*</p>
-        
-        <!-- Терминал теперь оформлен через CSS выше -->
-        <pre id="terminal"></pre>
-        
-        <a href="#" onclick="startHack(event)" class="btn">ЗАПУСТИТЬ ВЗЛОМ</a>
+<div class="dashboard">
+    <div class="header">
+        <h1>Deauther UI v3.0</h1>
+        <div class="status-badge" id="status">READY</div>
     </div>
+    
+    <div class="content">
+        <div class="controls">
+            <button id="scanBtn">Сканировать сети</button>
+            <button id="clearBtn" disabled>Очистить результаты</button>
+        </div>
 
-    <script>
-        const phrases = [
-            "[SYSTEM]: Подключение к прокси...",
-            "[SYSTEM]: Обход брандмауэра...",
-            "[ERROR]: Доступ заблокирован...",
-            "[SYSTEM]: Подбор ключей шифрования...",
-            "[SUCCESS]: Доступ получен! Вы внутри."
-        ];
+        <div class="loader" id="loader">СКАНИРОВАНИЕ ЭФИРА... пожалуйста, подождите</div>
 
-        let currentLine = 0;
-        let timer = null; 
+        <div class="network-list" id="networkList">
+            <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+                Список пуст. Нажмите «Сканировать сети».
+            </div>
+        </div>
 
-        function startHack(event) {
-            event.preventDefault(); 
+        <div class="terminal-log" id="terminalLog">
+            <div class="log-entry">[SYSTEM] Система симуляции инициализирована.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const scanBtn = document.getElementById('scanBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const networkList = document.getElementById('networkList');
+    const loader = document.getElementById('loader');
+    const statusBadge = document.getElementById('status');
+    const terminalLog = document.getElementById('terminalLog');
+
+    // Фейковые данные для симуляции
+    const mockNetworks = [
+        { ssid: "Home_WiFi_2.4G", mac: "AA:BB:CC:11:22:33", rssi: "-45 dBm" },
+        { ssid: "Keenetic-7741", mac: "11:22:33:44:55:66", rssi: "-62 dBm" },
+        { ssid: "TP-Link_Guest", mac: "99:88:77:66:55:44", rssi: "-78 dBm" },
+        { ssid: "iPhone_Hotspot", mac: "55:AA:55:AA:55:AA", rssi: "-31 dBm" },
+        { ssid: "Free_Cafe_WiFi", mac: "00:11:22:33:44:55", rssi: "-85 dBm" }
+    ];
+
+    function log(message) {
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        const time = new Date().toLocaleTimeString();
+        entry.textContent = `[${time}] ${message}`;
+        terminalLog.appendChild(entry);
+        terminalLog.scrollTop = terminalLog.scrollHeight;
+    }
+
+    scanBtn.addEventListener('click', () => {
+        // Меняем состояние интерфейса
+        scanBtn.disabled = true;
+        clearBtn.disabled = true;
+        networkList.style.display = 'none';
+        loader.style.display = 'block';
+        statusBadge.textContent = 'SCANNING';
+        statusBadge.style.borderColor = '#ffaa00';
+        statusBadge.style.color = '#ffaa00';
+        
+        log("Запущено фейковое сканирование каналов...");
+
+        // Имитируем задержку сети в 2 секунды
+        setTimeout(() => {
+            loader.style.display = 'none';
+            networkList.style.display = 'block';
+            networkList.innerHTML = ''; // Очищаем старое
+
+            // Рендерим фейковые сети
+            mockNetworks.forEach(net => {
+                const item = document.createElement('div');
+                item.className = 'network-item';
+                item.innerHTML = `
+                    <div class="network-info">
+                        <span class="ssid">${net.ssid}</span>
+                        <span class="mac">BSSID: ${net.mac}</span>
+                    </div>
+                    <div class="signal">${net.rssi}</div>
+                `;
+                networkList.appendChild(item);
+            });
+
+            scanBtn.disabled = false;
+            clearBtn.disabled = false;
+            statusBadge.textContent = 'READY';
+            statusBadge.style.borderColor = 'var(--accent-color)';
+            statusBadge.style.color = 'var(--accent-color)';
             
-            if (timer !== null) return;
+            log(`Сканирование завершено. Обнаружено сетей: ${mockNetworks.length}`);
+        }, 2000);
+    });
 
-            const terminal = document.getElementById("terminal");
-            const title = document.getElementById("main-title");
-            const button = event.target; 
-
-            button.innerText = "ИДЕТ ВЗЛОМ..."; 
-            button.style.borderColor = "#ffaa00"; 
-            button.style.color = "#ffaa00";
-
-            timer = setInterval(function() {
-                
-                if (currentLine < phrases.length) {
-                    terminal.innerText += phrases[currentLine] + "\n";
-                    currentLine++;
-                } else {
-                    clearInterval(timer); 
-                    
-                    title.innerText = "СИСТЕМА ВЗЛОМАНА";
-                    title.style.color = "#ff0000"; 
-                    title.style.textShadow = "0 0 10px #ff0000";
-
-                    button.innerText = "ВЗЛОМАНО";
-                    button.style.borderColor = "#ff0000";
-                    button.style.color = "#ff0000";
-                }
-
-            }, 1200); 
-        }
-    </script>
+    clearBtn.addEventListener('click', () => {
+        networkList.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+                Список пуст. Нажмите «Сканировать сети».
+            </div>
+        `;
+        clearBtn.disabled = true;
+        log("Список сетей очищен.");
+    });
+</script>
 
 </body>
 </html>
+
