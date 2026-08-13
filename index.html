@@ -14,7 +14,6 @@
             --danger-color: #ff3333;
             --warning-color: #ffaa00;
         }
-
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -27,7 +26,6 @@
             min-height: 100vh;
             box-sizing: border-box;
         }
-
         .dashboard {
             background-color: var(--panel-bg);
             border: 1px solid var(--accent-color);
@@ -38,12 +36,10 @@
             overflow: hidden;
             transition: border-color 0.3s ease;
         }
-
         .dashboard.attacking {
             border-color: var(--danger-color);
             box-shadow: 0 0 20px rgba(255, 51, 51, 0.15);
         }
-
         .header {
             background-color: #1a1a1a;
             padding: 15px;
@@ -52,7 +48,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .header h1 {
             margin: 0;
             font-size: 1.2rem;
@@ -61,11 +56,7 @@
             letter-spacing: 2px;
             transition: color 0.3s ease;
         }
-
-        .dashboard.attacking .header h1 {
-            color: var(--danger-color);
-        }
-
+        .dashboard.attacking .header h1 { color: var(--danger-color); }
         .status-badge {
             background-color: rgba(0, 255, 102, 0.1);
             color: var(--accent-color);
@@ -75,17 +66,8 @@
             border: 1px solid var(--accent-color);
             font-weight: bold;
         }
-
-        .content {
-            padding: 20px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
+        .content { padding: 20px; }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
         button {
             background: transparent;
             border: 1px solid var(--accent-color);
@@ -97,19 +79,12 @@
             text-transform: uppercase;
             font-weight: bold;
         }
-
         button:hover:not(:disabled) {
             background-color: var(--accent-color);
             color: var(--bg-color);
             box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
         }
-
-        button:disabled {
-            border-color: #333;
-            color: var(--text-muted);
-            cursor: not-allowed;
-        }
-
+        button:disabled { border-color: #333; color: var(--text-muted); cursor: not-allowed; }
         .btn-scan { flex: 2; }
         .btn-stop { 
             flex: 1; 
@@ -122,7 +97,6 @@
             color: var(--text-color);
             box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
         }
-
         .network-list {
             border: 1px solid #333;
             background-color: #0d0d0d;
@@ -130,7 +104,6 @@
             max-height: 285px;
             overflow-y: auto;
         }
-
         .network-item {
             display: flex;
             justify-content: space-between;
@@ -138,28 +111,12 @@
             border-bottom: 1px solid #222;
             align-items: center;
         }
-
-        .network-item:last-child {
-            border-bottom: none;
-        }
-
-        .network-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
+        .network-item:last-child { border-bottom: none; }
+        .network-info { display: flex; flex-direction: column; gap: 4px; }
         .ssid { font-weight: bold; }
         .mac { font-size: 0.75rem; color: var(--text-muted); }
-        
-        .network-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
+        .network-right { display: flex; align-items: center; gap: 20px; }
         .signal { color: var(--accent-color); font-size: 0.9rem; width: 60px; text-align: right; }
-
         .btn-attack-sm {
             padding: 5px 10px;
             font-size: 0.75rem;
@@ -171,7 +128,6 @@
             color: var(--bg-color);
             box-shadow: 0 0 8px rgba(255, 170, 0, 0.4);
         }
-
         .stats-panel {
             display: none;
             grid-template-columns: repeat(3, 1fr);
@@ -184,9 +140,7 @@
             font-size: 0.8rem;
             text-align: center;
         }
-
         .stat-val { font-weight: bold; color: var(--danger-color); margin-top: 4px; }
-
         .terminal-log {
             margin-top: 20px;
             background-color: #000;
@@ -198,11 +152,9 @@
             overflow-y: auto;
             border-radius: 4px;
         }
-
         .log-entry { margin-bottom: 4px; line-height: 1.3; }
         .log-danger { color: var(--danger-color); }
         .log-warn { color: var(--warning-color); }
-
         .loader {
             display: none;
             text-align: center;
@@ -245,7 +197,6 @@
         </div>
     </div>
 </div>
-
 <script>
     const scanBtn = document.getElementById('scanBtn');
     const stopBtn = document.getElementById('stopBtn');
@@ -281,19 +232,15 @@
         terminalLog.scrollTop = terminalLog.scrollHeight;
     }
 
-    // Сканирование
     scanBtn.addEventListener('click', () => {
         if(isAttacking) return;
-        
         scanBtn.disabled = true;
         networkList.style.display = 'none';
         loader.style.display = 'block';
         statsPanel.style.display = 'none';
-        
         statusBadge.textContent = 'SCANNING';
         statusBadge.style.borderColor = 'var(--warning-color)';
         statusBadge.style.color = 'var(--warning-color)';
-        
         log("Запуск пассивного сканирования каналов 1-13...");
 
         setTimeout(() => {
@@ -301,7 +248,7 @@
             networkList.style.display = 'block';
             networkList.innerHTML = '';
 
-            mockNetworks.forEach((net, index) => {
+            mockNetworks.forEach((net) => {
                 const item = document.createElement('div');
                 item.className = 'network-item';
                 item.innerHTML = `
@@ -311,4 +258,68 @@
                     </div>
                     <div class="network-right">
                         <div class="signal">${net.rssi}</div>
-    
+                        <button class="btn-attack-sm" data-ssid="${net.ssid}" data-mac="${net.mac}">DEAUTH</button>
+                    </div>
+                `;
+                networkList.appendChild(item);
+            });
+
+            document.querySelectorAll('.btn-attack-sm').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    startFakeAttack(this.getAttribute('data-ssid'), this.getAttribute('data-mac'));
+                });
+            });
+
+            scanBtn.disabled = false;
+            statusBadge.textContent = 'READY';
+            statusBadge.style.borderColor = 'var(--accent-color)';
+            statusBadge.style.color = 'var(--accent-color)';
+            log(`Найдено беспроводных точек доступа: ${mockNetworks.length}`);
+        }, 1500);
+    });
+
+    function startFakeAttack(ssid, mac) {
+        if(isAttacking) return;
+        isAttacking = true;
+        packetCount = 0;
+        dashboard.classList.add('attacking');
+        scanBtn.style.display = 'none';
+        stopBtn.style.display = 'block';
+        statusBadge.textContent = 'ATTACKING';
+        statusBadge.style.borderColor = 'var(--danger-color)';
+        statusBadge.style.color = 'var(--danger-color)';
+        document.querySelectorAll('.btn-attack-sm').forEach(btn => btn.disabled = true);
+        statsPanel.style.display = 'grid';
+        statTarget.textContent = ssid;
+        statPkts.textContent = '0';
+        statSpeed.textContent = '0 пкт/с';
+        log(`Инициализация атаки деаутентификации на ${ssid} (${mac})...`, 'warn');
+
+        attackInterval = setInterval(() => {
+            const batch = Math.floor(Math.random() * 15) + 20;
+            packetCount += batch;
+            statPkts.textContent = packetCount;
+            statSpeed.textContent = `${batch * 4} пкт/с`;
+            const frameType = Math.random() > 0.5 ? 'Reason 1 (Unspecified)' : 'Reason 4 (Disassociated due to inactivity)';
+            log(`[ATTACK] Отправлено ${batch} deauth-фреймов -> ${frameType}`, 'danger');
+        }, 250);
+    }
+
+    function stopAttack() {
+        if(!isAttacking) return;
+        clearInterval(attackInterval);
+        isAttacking = false;
+        dashboard.classList.remove('attacking');
+        scanBtn.style.display = 'block';
+        stopBtn.style.display = 'none';
+        statusBadge.textContent = 'READY';
+        statusBadge.style.borderColor = 'var(--accent-color)';
+        statusBadge.style.color = 'var(--accent-color)';
+        document.querySelectorAll('.btn-attack-sm').forEach(btn => btn.disabled = false);
+        log("Атака остановлена пользователем.");
+    }
+
+    stopBtn.addEventListener('click', stopAttack);
+</script>
+</body>
+</html>
