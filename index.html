@@ -5,64 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой сайт со снеговиком</title>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #0e1621; /* Глубокий темно-синий цвет фона (как в Telegram) */
-            color: #f5f5f5;            /* Светлый цвет текста для хорошей читаемости */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        <body>
+
+    <div class="card">
+        <div class="avatar">😈</div>
+        <h1 id="main-title">HACKED ME</h1>
+        
+        <!-- Этот блок кода изначально пустой, в него JS будет дописывать строчки -->
+        <pre id="terminal" style="color: #00ff00; text-align: left; font-family: monospace; font-size: 14px; margin-bottom: 20px;"></pre>
+        
+        <!-- Кнопка теперь вызывает функцию при клике (onclick) -->
+        <a href="#" onclick="startHack(event)" class="btn">ЗАПУСТИТЬ ВЗЛОМ</a>
+    </div>
+
+    <!-- Зона JavaScript -->
+    <script>
+        // Это аналог массива (Array) в GDScript
+        const phrases = [
+            "[SYSTEM]: Подключение к прокси...",
+            "[SYSTEM]: Обход брандмауэра...",
+            "[ERROR]: Доступ заблокирован...",
+            "[SYSTEM]: Подбор ключей шифрования...",
+            "[SUCCESS]: Доступ получен! Вы внутри."
+        ];
+
+        let currentLine = 0;
+
+        // Это функция, аналог func startHack() в GDScript
+        function startHack(event) {
+            event.preventDefault(); // Запрещаем ссылке перезагружать страницу
+            
+            // Находим наш пустой блок <pre> по его ID (как get_node() или $Terminal в Godot)
+            const terminal = document.getElementById("terminal");
+            const title = document.getElementById("main-title");
+
+            if (currentLine < phrases.length) {
+                // Дописываем строчку текста и перенос строки (\n)
+                terminal.innerText += phrases[currentLine] + "\n";
+                currentLine++;
+            } else {
+                // Если строчки закончились, меняем заголовок (как title.text = "...")
+                title.innerText = "СИСТЕМА ВЗЛОМАНА";
+                title.style.color = "#ff0000"; // Меняем цвет на красный
+            }
         }
-        .card {
-            background: #17212b;      /* Фон самой карточки чуть светлее общего фона */
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); /* Тень сделали более глубокой */
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
+    </script>
+
+</body>
+; /* Цвет кнопки при наведении пальцем или мышкой */
         }
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #00ff00, #00aa00); /* Градиент в синих тонах */
-            margin: 0 auto 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 40px;
-        }
-        h1 {
-            margin: 0 0 10px 0;
-            font-size: 34px;
-            color: #00ff00;           /* зеленый цвет для заголовка */
-        }
-        p {
-            color: #00ff00;           /* Приглушенный серо-синий цвет для описания */
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 25px;
-        }
-        .btn {
-            display: inline-block;
-            background-color: #00ff00; /* Фирменный синий цвет кнопки */
-            color: white;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
-        .btn:hover {
-            background-color: #1a6fa8; /* Цвет кнопки при наведении пальцем или мышкой */
-        }
-    </style>
-</head>
-<body>
+
 
     <div class="card">
         <div class="avatar">😈</div>
