@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HACKED ME</title>
     <style>
-        /* CSS-Купец наводит хакерский стиль */
         body {
             font-family: 'Courier New', monospace;
-            background-color: #050505; /* Почти полностью чёрный фон */
-            color: #00ff00;            /* Ярко-зелёный хакерский текст */
+            background-color: #050505;
+            color: #00ff00;
             margin: 0;
             padding: 0;
             display: flex;
@@ -18,16 +17,14 @@
             min-height: 100vh;
         }
         .card {
-            background: #111111;      /* Чёрная карточка чуть светлее фона */
+            background: #111111;
             padding: 30px;
-            border-radius: 10px;       /* Сделали углы более острыми */
-            border: 1px solid #00ff00; /* Зелёная рамка вокруг карточки */
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2); /* Неоновое зелёное свечение */
+            border-radius: 10px;
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
             text-align: center;
             max-width: 400px;
             width: 90%;
-            <pre id="terminal" style="color: #00ff00; text-align: left; font-size: 14px; margin-bottom: 20px; white-space: pre-wrap; animation: matrix-blink 1.5s infinite;"></pre>
-            
         }
         .avatar {
             font-size: 50px;
@@ -56,34 +53,42 @@
         }
         .btn:hover {
             background-color: #00ff00;
-            color: #000000; /* При наведении кнопка заливается зелёным, а текст чернеет */
+            color: #000000;
             box-shadow: 0 0 15px #00ff00;
         }
-        /* Создаем указ для анимации: меняем прозрачность от 100% до 40% */
-@keyframes matrix-blink {
-    0% { opacity: 1; }
-    50% { opacity: 0.4; }
-    100% { opacity: 1; }
-}
-        
+
+        /* КУПЕЦ: Создаем анимацию мерцания экрана */
+        @keyframes matrix-blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Применяем мерцание к терминалу */
+        #terminal {
+            color: #00ff00; 
+            text-align: left; 
+            font-size: 14px; 
+            margin-bottom: 20px; 
+            white-space: pre-wrap; 
+            animation: matrix-blink 2s infinite; /* Плавно мерцает каждые 2 секунды */
+        }
     </style>
 </head>
 <body>
 
-    <!-- HTML-Работяга строит каркас сайта -->
     <div class="card">
         <div class="avatar">😈</div>
         <h1 id="main-title">HACKED ME</h1>
         
         <p class="static-text">#$£&@#*</p>
         
-        <!-- Сюда Король-JS будет дописывать строчки лога -->
-        <pre id="terminal" style="color: #00ff00; text-align: left; font-size: 14px; margin-bottom: 20px; white-space: pre-wrap;"></pre>
+        <!-- Терминал теперь оформлен через CSS выше -->
+        <pre id="terminal"></pre>
         
         <a href="#" onclick="startHack(event)" class="btn">ЗАПУСТИТЬ ВЗЛОМ</a>
     </div>
 
-        <!-- JS-Король управляет логикой по таймеру -->
     <script>
         const phrases = [
             "[SYSTEM]: Подключение к прокси...",
@@ -94,34 +99,29 @@
         ];
 
         let currentLine = 0;
-        let timer = null; // Переменная, где будет храниться наш запущенный таймер
+        let timer = null; 
 
         function startHack(event) {
             event.preventDefault(); 
             
-            // Если таймер уже запущен, второй раз нажимать не даем
             if (timer !== null) return;
 
             const terminal = document.getElementById("terminal");
             const title = document.getElementById("main-title");
-            const button = event.target; // Находим саму кнопку, на которую нажали
+            const button = event.target; 
 
-            button.innerText = "ИДЕТ ВЗЛОМ..."; // Меняем текст на кнопке
-            button.style.borderColor = "#ffaa00"; // Делаем кнопку оранжевой на время процесса
+            button.innerText = "ИДЕТ ВЗЛОМ..."; 
+            button.style.borderColor = "#ffaa00"; 
             button.style.color = "#ffaa00";
 
-            // Запускаем таймер: функция внутри будет выполняться каждые 1200 миллисекунд (1.2 секунды)
             timer = setInterval(function() {
                 
                 if (currentLine < phrases.length) {
-                    // Печатаем текущую строку
                     terminal.innerText += phrases[currentLine] + "\n";
                     currentLine++;
                 } else {
-                    // Когда строки закончились, нужно ОСТАНОВИТЬ таймер, иначе он будет крутиться вечно
                     clearInterval(timer); 
                     
-                    // Финальный аккорд: красим заголовок и кнопку в красный
                     title.innerText = "СИСТЕМА ВЗЛОМАНА";
                     title.style.color = "#ff0000"; 
                     title.style.textShadow = "0 0 10px #ff0000";
@@ -131,9 +131,9 @@
                     button.style.color = "#ff0000";
                 }
 
-            }, 1200); // 1200 мс — скорость появления строчек. Можно поменять на 500 для быстрой печати!
+            }, 1200); 
         }
     </script>
-    
+
 </body>
 </html>
