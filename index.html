@@ -191,7 +191,39 @@
             <div>Отправлено пакетов:<div class="stat-val" id="statPkts">0</div></div>
             <div>Скорость:<div class="stat-val" id="statSpeed">0 пкт/с</div></div>
         </div>
+<!-- Переключатель режимов -->
+<div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 15px;">
+    <button id="tabDeauth" style="background: var(--accent-color); color: var(--bg-color);">Wi-Fi Deauther</button>
+    <button id="tabDdos">Web DDoS Sim</button>
+</div>
 
+<!-- Блок DDoS атаки (по умолчанию скрыт) -->
+<div id="ddosPanel" style="display: none; border: 1px solid #333; background: #0d0d0d; padding: 20px; border-radius: 4px; margin-bottom: 20px;">
+    <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);">ЦЕЛЕВОЙ URL ИЛИ IP-АДРЕС:</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="targetUrl" value="https://example.com" style="flex: 1; background: #000; border: 1px solid var(--accent-color); color: #fff; padding: 10px; font-family: inherit; font-size: 0.9rem; outline: none;">
+            <button id="startDdosBtn" style="border-color: var(--danger-color); color: var(--danger-color);">LAUNCH</button>
+        </div>
+    </div>
+    
+    <!-- График и статистика DDoS -->
+    <div id="ddosStats" style="display: none; margin-top: 15px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.8rem; text-align: center; background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #333; margin-bottom: 15px;">
+            <div>Потоки (Threads):<div class="stat-val" style="color: var(--warning-color);">256 / 256</div></div>
+            <div>Всего запросов:<div class="stat-val" id="ddosTotalReq" style="color: var(--danger-color);">0</div></div>
+        </div>
+        <!-- Фейковый индикатор полосы пропускания -->
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; display: flex; justify-content: space-between;">
+            <span>Ширина канала (Traffic Rate)</span>
+            <span id="trafficRate">0 Gbps</span>
+        </div>
+        <div style="width: 100%; background: #222; height: 12px; border-radius: 2px; overflow: hidden; border: 1px solid #333;">
+            <div id="trafficBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--warning-color), var(--danger-color)); transition: width 0.4s ease;"></div>
+        </div>
+    </div>
+</div>
+        
         <div class="terminal-log" id="terminalLog">
             <div class="log-entry">[SYSTEM] Симулятор интерфейса готов к работе.</div>
         </div>
@@ -320,6 +352,114 @@
     }
 
     stopBtn.addEventListener('click', stopAttack);
+    // Логика переключения вкладок и DDoS симуляции
+const tabDeauth = document.getElementById('tabDeauth');
+const tabDdos = document.getElementById('tabDdos');
+const ddosPanel = document.getElementById('ddosPanel');
+const networkListWrapper = document.getElementById('networkList');
+const controlsWrapper = document.querySelector('.controls');
+
+const targetUrlInput = document.getElementById('targetUrl');
+const startDdosBtn = document.getElementById('startDdosBtn');
+const ddosStats = document.getElementById('ddosStats');
+const ddosTotalReq = document.getElementById('ddosTotalReq');
+const trafficRate = document.getElementById('trafficRate');
+const trafficBar = document.getElementById('trafficBar');
+
+let ddosInterval = null;
+let ddosReqCount = 0;
+let isDdosAttacking = false;
+
+// Переключение на вкладку Deauth
+tabDeauth.addEventListener('click', () => {
+    if (isDdosAttacking || isAttacking) return;
+    tabDeauth.style.background = 'var(--accent-color)';
+    tabDeauth.style.color = 'var(--bg-color)';
+    tabDdos.style.background = 'transparent';
+    tabDdos.style.color = 'var(--accent-color)';
+    
+    networkListWrapper.style.display = 'block';
+    controlsWrapper.style.display = 'flex';
+    ddosPanel.style.display = 'none';
+});
+
+// Переключение на вкладку DDoS
+tabDdos.addEventListener('click', () => {
+    if (isDdosAttacking || isAttacking) return;
+    tabDdos.style.background = 'var(--accent-color)';
+    tabDdos.style.color = 'var(--bg-color)';
+    tabDeauth.style.background = 'transparent';
+    tabDeauth.style.color = 'var(--accent-color)';
+    
+    networkListWrapper.style.display = 'none';
+    controlsWrapper.style.display = 'none';
+    loader.style.display = 'none';
+    statsPanel.style.display = 'none';
+    ddosPanel.style.display = 'block';
+});
+
+// Запуск / Остановка фейковой DDoS атаки
+startDdosBtn.addEventListener('click', () => {
+    if (!isDdosAttacking) {
+        // Старт атаки
+        const rawUrl = targetUrlInput.value.trim() || "example.com";
+        isDdosAttacking = true;
+        ddosReqCount = 0;
+        
+        startDdosBtn.textContent = "STOP";
+        targetUrlInput.disabled = true;
+        ddosStats.style.display = 'block';
+        
+        statusBadge.textContent = 'DDOSING';
+        statusBadge.style.borderColor = 'var(--danger-color)';
+        statusBadge.style.color = 'var(--danger-color)';
+        dashboard.classList.add('attacking');
+        
+        log(`[DDoS] Инициализация HTTP Flood атаки на цель: ${rawUrl}...`, 'warn');
+        log(`[DDoS] Запуск асинхронных сокетов SYN/TCP...`, 'warn');
+        
+        ddosInterval = setInterval(() => {
+            // Генерируем случайный всплеск запросов
+            const batch = Math.floor(Math.random() * 450) + 800;
+            ddosReqCount += batch;
+            ddosTotalReq.textContent = ddosReqCount.toLocaleString();
+            
+            // Прыгающий фейковый трафик в гигабитах
+            const currentGbps = (Math.random() * 12 + 84).toFixed(2);
+            trafficRate.textContent = `${currentGbps} Gbps`;
+            trafficBar.style.width = `${Math.floor(Math.random() * 15) + 80}%`;
+            
+            // Рандомные методы запросов для реалистичности лога
+            const methods = ['GET', 'POST', 'HEAD'];
+            const randomMethod = methods[Math.floor(Math.random() * methods.length)];
+            log(`[FLOOD] ${randomMethod} запросы отправлены на ${rawUrl} (Пакет: +${batch})`, 'danger');
+            
+            // Имитируем падение сайта после накопления 15 000 запросов
+            if (ddosReqCount > 15000 && ddosReqCount < 16500) {
+                log(`[CRITICAL] Сервер ${rawUrl} перегружен! Получен код ответа: 502 Bad Gateway.`, 'warn');
+                statusBadge.textContent = 'HOST_DOWN';
+            }
+        }, 300);
+    } else {
+        // Остановка атаки
+        clearInterval(ddosInterval);
+        isDdosAttacking = false;
+        
+        startDdosBtn.textContent = "LAUNCH";
+        targetUrlInput.disabled = false;
+        
+        statusBadge.textContent = 'READY';
+        statusBadge.style.borderColor = 'var(--accent-color)';
+        statusBadge.style.color = 'var(--accent-color)';
+        dashboard.classList.remove('attacking');
+        
+        trafficBar.style.width = '0%';
+        trafficRate.textContent = '0 Gbps';
+        
+        log("[DDoS] Атака остановлена. Все потоки закрыты.");
+    }
+});
+    
 </script>
 </body>
 </html>
