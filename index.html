@@ -12,6 +12,7 @@
             --text-color: #ffffff;
             --text-muted: #888888;
             --danger-color: #ff3333;
+            --warning-color: #ffaa00;
         }
 
         body {
@@ -30,11 +31,17 @@
         .dashboard {
             background-color: var(--panel-bg);
             border: 1px solid var(--accent-color);
-            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.1);
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             border-radius: 8px;
             overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .dashboard.attacking {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.15);
         }
 
         .header {
@@ -52,6 +59,11 @@
             color: var(--accent-color);
             text-transform: uppercase;
             letter-spacing: 2px;
+            transition: color 0.3s ease;
+        }
+
+        .dashboard.attacking .header h1 {
+            color: var(--danger-color);
         }
 
         .status-badge {
@@ -61,6 +73,7 @@
             border-radius: 4px;
             font-size: 0.8rem;
             border: 1px solid var(--accent-color);
+            font-weight: bold;
         }
 
         .content {
@@ -80,30 +93,41 @@
             padding: 10px 20px;
             font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-transform: uppercase;
             font-weight: bold;
-            flex: 1;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background-color: var(--accent-color);
             color: var(--bg-color);
-            box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
         }
 
         button:disabled {
-            border-color: var(--text-muted);
+            border-color: #333;
             color: var(--text-muted);
             cursor: not-allowed;
-            box-shadow: none;
+        }
+
+        .btn-scan { flex: 2; }
+        .btn-stop { 
+            flex: 1; 
+            border-color: var(--danger-color); 
+            color: var(--danger-color);
+            display: none;
+        }
+        .btn-stop:hover:not(:disabled) {
+            background-color: var(--danger-color);
+            color: var(--text-color);
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
         }
 
         .network-list {
             border: 1px solid #333;
             background-color: #0d0d0d;
             border-radius: 4px;
-            max-height: 250px;
+            max-height: 285px;
             overflow-y: auto;
         }
 
@@ -125,19 +149,43 @@
             gap: 4px;
         }
 
-        .ssid {
-            font-weight: bold;
+        .ssid { font-weight: bold; }
+        .mac { font-size: 0.75rem; color: var(--text-muted); }
+        
+        .network-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .mac {
+        .signal { color: var(--accent-color); font-size: 0.9rem; width: 60px; text-align: right; }
+
+        .btn-attack-sm {
+            padding: 5px 10px;
             font-size: 0.75rem;
-            color: var(--text-muted);
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+        }
+        .btn-attack-sm:hover:not(:disabled) {
+            background-color: var(--warning-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 8px rgba(255, 170, 0, 0.4);
         }
 
-        .signal {
-            color: var(--accent-color);
-            font-size: 0.9rem;
+        .stats-panel {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            font-size: 0.8rem;
+            text-align: center;
         }
+
+        .stat-val { font-weight: bold; color: var(--danger-color); margin-top: 4px; }
 
         .terminal-log {
             margin-top: 20px;
@@ -146,27 +194,27 @@
             padding: 10px;
             font-size: 0.8rem;
             color: #00ff00;
-            height: 80px;
+            height: 100px;
             overflow-y: auto;
             border-radius: 4px;
         }
 
-        .log-entry {
-            margin-bottom: 4px;
-        }
+        .log-entry { margin-bottom: 4px; line-height: 1.3; }
+        .log-danger { color: var(--danger-color); }
+        .log-warn { color: var(--warning-color); }
 
-        /* Анимация загрузки */
         .loader {
             display: none;
             text-align: center;
-            padding: 20px;
-            color: var(--accent-color);
+            padding: 30px;
+            color: var(--warning-color);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-<div class="dashboard">
+<div class="dashboard" id="mainDashboard">
     <div class="header">
         <h1>Deauther UI v3.0</h1>
         <div class="status-badge" id="status">READY</div>
@@ -174,33 +222,48 @@
     
     <div class="content">
         <div class="controls">
-            <button id="scanBtn">Сканировать сети</button>
-            <button id="clearBtn" disabled>Очистить результаты</button>
+            <button id="scanBtn" class="btn-scan">Сканировать эфир</button>
+            <button id="stopBtn" class="btn-stop">Стоп атака</button>
         </div>
 
-        <div class="loader" id="loader">СКАНИРОВАНИЕ ЭФИРА... пожалуйста, подождите</div>
+        <div class="loader" id="loader">СКАНИРОВАНИЕ ЧАСТОТ... ПОДОЖДИТЕ</div>
 
         <div class="network-list" id="networkList">
-            <div style="padding: 20px; text-align: center; color: var(--text-muted);">
-                Список пуст. Нажмите «Сканировать сети».
+            <div style="padding: 30px; text-align: center; color: var(--text-muted);">
+                Список пуст. Запустите сканирование.
             </div>
         </div>
 
+        <div class="stats-panel" id="statsPanel">
+            <div>Цель:<div class="stat-val" id="statTarget">-</div></div>
+            <div>Отправлено пакетов:<div class="stat-val" id="statPkts">0</div></div>
+            <div>Скорость:<div class="stat-val" id="statSpeed">0 пкт/с</div></div>
+        </div>
+
         <div class="terminal-log" id="terminalLog">
-            <div class="log-entry">[SYSTEM] Система симуляции инициализирована.</div>
+            <div class="log-entry">[SYSTEM] Симулятор интерфейса готов к работе.</div>
         </div>
     </div>
 </div>
 
 <script>
     const scanBtn = document.getElementById('scanBtn');
-    const clearBtn = document.getElementById('clearBtn');
+    const stopBtn = document.getElementById('stopBtn');
     const networkList = document.getElementById('networkList');
     const loader = document.getElementById('loader');
     const statusBadge = document.getElementById('status');
     const terminalLog = document.getElementById('terminalLog');
+    const dashboard = document.getElementById('mainDashboard');
+    
+    const statsPanel = document.getElementById('statsPanel');
+    const statTarget = document.getElementById('statTarget');
+    const statPkts = document.getElementById('statPkts');
+    const statSpeed = document.getElementById('statSpeed');
 
-    // Фейковые данные для симуляции
+    let attackInterval = null;
+    let packetCount = 0;
+    let isAttacking = false;
+
     const mockNetworks = [
         { ssid: "Home_WiFi_2.4G", mac: "AA:BB:CC:11:22:33", rssi: "-45 dBm" },
         { ssid: "Keenetic-7741", mac: "11:22:33:44:55:66", rssi: "-62 dBm" },
@@ -209,35 +272,36 @@
         { ssid: "Free_Cafe_WiFi", mac: "00:11:22:33:44:55", rssi: "-85 dBm" }
     ];
 
-    function log(message) {
+    function log(message, type = '') {
         const entry = document.createElement('div');
-        entry.className = 'log-entry';
+        entry.className = 'log-entry ' + (type ? `log-${type}` : '');
         const time = new Date().toLocaleTimeString();
         entry.textContent = `[${time}] ${message}`;
         terminalLog.appendChild(entry);
         terminalLog.scrollTop = terminalLog.scrollHeight;
     }
 
+    // Функция сканирования
     scanBtn.addEventListener('click', () => {
-        // Меняем состояние интерфейса
+        if(isAttacking) return;
+        
         scanBtn.disabled = true;
-        clearBtn.disabled = true;
         networkList.style.display = 'none';
         loader.style.display = 'block';
-        statusBadge.textContent = 'SCANNING';
-        statusBadge.style.borderColor = '#ffaa00';
-        statusBadge.style.color = '#ffaa00';
+        statsPanel.style.display = 'none';
         
-        log("Запущено фейковое сканирование каналов...");
+        statusBadge.textContent = 'SCANNING';
+        statusBadge.style.borderColor = 'var(--warning-color)';
+        statusBadge.style.color = 'var(--warning-color)';
+        
+        log("Запуск пассивного сканирования каналов 1-13...");
 
-        // Имитируем задержку сети в 2 секунды
         setTimeout(() => {
             loader.style.display = 'none';
             networkList.style.display = 'block';
-            networkList.innerHTML = ''; // Очищаем старое
+            networkList.innerHTML = '';
 
-            // Рендерим фейковые сети
-            mockNetworks.forEach(net => {
+            mockNetworks.forEach((net, index) => {
                 const item = document.createElement('div');
                 item.className = 'network-item';
                 item.innerHTML = `
@@ -245,32 +309,7 @@
                         <span class="ssid">${net.ssid}</span>
                         <span class="mac">BSSID: ${net.mac}</span>
                     </div>
-                    <div class="signal">${net.rssi}</div>
-                `;
-                networkList.appendChild(item);
-            });
-
-            scanBtn.disabled = false;
-            clearBtn.disabled = false;
-            statusBadge.textContent = 'READY';
-            statusBadge.style.borderColor = 'var(--accent-color)';
-            statusBadge.style.color = 'var(--accent-color)';
-            
-            log(`Сканирование завершено. Обнаружено сетей: ${mockNetworks.length}`);
-        }, 2000);
-    });
-
-    clearBtn.addEventListener('click', () => {
-        networkList.innerHTML = `
-            <div style="padding: 20px; text-align: center; color: var(--text-muted);">
-                Список пуст. Нажмите «Сканировать сети».
-            </div>
-        `;
-        clearBtn.disabled = true;
-        log("Список сетей очищен.");
-    });
-</script>
-
-</body>
-</html>
+                    <div class="network-right">
+                        <div class="signal">${net.rssi}</div>
+    
 
