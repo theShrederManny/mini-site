@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой первый сайт на GitHub</title>
+    <title>Мой сайт со снеговиком</title>
     <style>
-        /* Стили для красивого оформления сайта */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #0e1621; /* Глубокий темно-синий цвет фона (как в Telegram) */
+            color: #f5f5f5;            /* Светлый цвет текста для хорошей читаемости */
             margin: 0;
             padding: 0;
             display: flex;
@@ -18,10 +17,10 @@
             min-height: 100vh;
         }
         .card {
-            background: white;
+            background: #17212b;      /* Фон самой карточки чуть светлее общего фона */
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); /* Тень сделали более глубокой */
             text-align: center;
             max-width: 400px;
             width: 90%;
@@ -30,28 +29,27 @@
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #007bff, #00ff88);
+            background: linear-gradient(45deg, #2b5278, #5288c1); /* Градиент в синих тонах */
             margin: 0 auto 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 40px;
-            color: white;
         }
         h1 {
             margin: 0 0 10px 0;
             font-size: 24px;
-            color: #111;
+            color: #ffffff;           /* Белый цвет для заголовка */
         }
         p {
-            color: #666;
+            color: #7f91a4;           /* Приглушенный серо-синий цвет для описания */
             font-size: 16px;
             line-height: 1.5;
             margin-bottom: 25px;
         }
         .btn {
             display: inline-block;
-            background-color: #007bff;
+            background-color: #2481cc; /* Фирменный синий цвет кнопки */
             color: white;
             text-decoration: none;
             padding: 12px 24px;
@@ -60,25 +58,19 @@
             transition: background 0.3s ease;
         }
         .btn:hover {
-            background-color: #0056b3;
+            background-color: #1a6fa8; /* Цвет кнопки при наведении пальцем или мышкой */
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <!-- Круглая аватарка (пока просто эмодзи вместо картинки) -->
         <div class="avatar">☃️</div>
-        
-        <!-- Заголовок сайта -->
         <h1>Привет, мир!</h1>
-        
-        <!-- Описание -->
         <p>Это мой самый первый сайт, который я успешно запустил на бесплатном хостинге GitHub Pages. Теперь его может увидеть любой человек в интернете!</p>
-        
-        <!-- Кнопка со ссылкой -->
         <a href="https://github.com" target="_blank" class="btn">Открыть мой GitHub</a>
     </div>
 
 </body>
 </html>
+
