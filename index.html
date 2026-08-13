@@ -3,24 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой сайт со снеговиком</title>
+    <title>HACKED ME</title>
     <style>
-        <body>
+        /* CSS-Купец наводит хакерский стиль */
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #050505; /* Почти полностью чёрный фон */
+            color: #00ff00;            /* Ярко-зелёный хакерский текст */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: #111111;      /* Чёрная карточка чуть светлее фона */
+            padding: 30px;
+            border-radius: 10px;       /* Сделали углы более острыми */
+            border: 1px solid #00ff00; /* Зелёная рамка вокруг карточки */
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2); /* Неоновое зелёное свечение */
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .avatar {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 26px;
+            letter-spacing: 2px;
+        }
+        .static-text {
+            color: #888888;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: transparent;
+            color: #00ff00;
+            text-decoration: none;
+            padding: 12px 24px;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #00ff00;
+            color: #000000; /* При наведении кнопка заливается зелёным, а текст чернеет */
+            box-shadow: 0 0 15px #00ff00;
+        }
+    </style>
+</head>
+<body>
 
+    <!-- HTML-Работяга строит каркас сайта -->
     <div class="card">
         <div class="avatar">😈</div>
         <h1 id="main-title">HACKED ME</h1>
         
-        <!-- Этот блок кода изначально пустой, в него JS будет дописывать строчки -->
-        <pre id="terminal" style="color: #00ff00; text-align: left; font-family: monospace; font-size: 14px; margin-bottom: 20px;"></pre>
+        <p class="static-text">#$£&@#*</p>
         
-        <!-- Кнопка теперь вызывает функцию при клике (onclick) -->
+        <!-- Сюда Король-JS будет дописывать строчки лога -->
+        <pre id="terminal" style="color: #00ff00; text-align: left; font-size: 14px; margin-bottom: 20px; white-space: pre-wrap;"></pre>
+        
         <a href="#" onclick="startHack(event)" class="btn">ЗАПУСТИТЬ ВЗЛОМ</a>
     </div>
 
-    <!-- Зона JavaScript -->
+    <!-- JS-Король управляет логикой клика -->
     <script>
-        // Это аналог массива (Array) в GDScript
         const phrases = [
             "[SYSTEM]: Подключение к прокси...",
             "[SYSTEM]: Обход брандмауэра...",
@@ -31,38 +86,22 @@
 
         let currentLine = 0;
 
-        // Это функция, аналог func startHack() в GDScript
         function startHack(event) {
-            event.preventDefault(); // Запрещаем ссылке перезагружать страницу
+            event.preventDefault(); 
             
-            // Находим наш пустой блок <pre> по его ID (как get_node() или $Terminal в Godot)
             const terminal = document.getElementById("terminal");
             const title = document.getElementById("main-title");
 
             if (currentLine < phrases.length) {
-                // Дописываем строчку текста и перенос строки (\n)
                 terminal.innerText += phrases[currentLine] + "\n";
                 currentLine++;
             } else {
-                // Если строчки закончились, меняем заголовок (как title.text = "...")
                 title.innerText = "СИСТЕМА ВЗЛОМАНА";
-                title.style.color = "#ff0000"; // Меняем цвет на красный
+                title.style.color = "#ff0000"; 
+                title.style.textShadow = "0 0 10px #ff0000";
             }
         }
     </script>
 
 </body>
-; /* Цвет кнопки при наведении пальцем или мышкой */
-        }
-
-
-    <div class="card">
-        <div class="avatar">😈</div>
-        <h1>HACKED ME</h1>
-        <p>#$£&@#*</p>
-        <a href="https://github.com" target="_blank" class="btn">HACK ME</a>
-    </div>
-
-</body>
 </html>
-
