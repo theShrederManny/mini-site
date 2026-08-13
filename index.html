@@ -74,7 +74,7 @@
         <a href="#" onclick="startHack(event)" class="btn">ЗАПУСТИТЬ ВЗЛОМ</a>
     </div>
 
-    <!-- JS-Король управляет логикой клика -->
+        <!-- JS-Король управляет логикой по таймеру -->
     <script>
         const phrases = [
             "[SYSTEM]: Подключение к прокси...",
@@ -85,23 +85,46 @@
         ];
 
         let currentLine = 0;
+        let timer = null; // Переменная, где будет храниться наш запущенный таймер
 
         function startHack(event) {
             event.preventDefault(); 
             
+            // Если таймер уже запущен, второй раз нажимать не даем
+            if (timer !== null) return;
+
             const terminal = document.getElementById("terminal");
             const title = document.getElementById("main-title");
+            const button = event.target; // Находим саму кнопку, на которую нажали
 
-            if (currentLine < phrases.length) {
-                terminal.innerText += phrases[currentLine] + "\n";
-                currentLine++;
-            } else {
-                title.innerText = "СИСТЕМА ВЗЛОМАНА";
-                title.style.color = "#ff0000"; 
-                title.style.textShadow = "0 0 10px #ff0000";
-            }
+            button.innerText = "ИДЕТ ВЗЛОМ..."; // Меняем текст на кнопке
+            button.style.borderColor = "#ffaa00"; // Делаем кнопку оранжевой на время процесса
+            button.style.color = "#ffaa00";
+
+            // Запускаем таймер: функция внутри будет выполняться каждые 1200 миллисекунд (1.2 секунды)
+            timer = setInterval(function() {
+                
+                if (currentLine < phrases.length) {
+                    // Печатаем текущую строку
+                    terminal.innerText += phrases[currentLine] + "\n";
+                    currentLine++;
+                } else {
+                    // Когда строки закончились, нужно ОСТАНОВИТЬ таймер, иначе он будет крутиться вечно
+                    clearInterval(timer); 
+                    
+                    // Финальный аккорд: красим заголовок и кнопку в красный
+                    title.innerText = "СИСТЕМА ВЗЛОМАНА";
+                    title.style.color = "#ff0000"; 
+                    title.style.textShadow = "0 0 10px #ff0000";
+
+                    button.innerText = "ВЗЛОМАНО";
+                    button.style.borderColor = "#ff0000";
+                    button.style.color = "#ff0000";
+                }
+
+            }, 1200); // 1200 мс — скорость появления строчек. Можно поменять на 500 для быстрой печати!
         }
     </script>
-
+    
 </body>
 </html>
